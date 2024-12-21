@@ -76,11 +76,15 @@ struct max_op
  *  @param max_values   (nblocksx x width) matrix
  */
 template <size_t bsize, typename TensorDataType>
-__global__ void reduce_max_kernel(size_t height,
-                                  size_t width,
-                                  const TensorDataType* __restrict__ values,
-                                  size_t values_ldim,
-                                  TensorDataType* __restrict__ max_values)
+#ifdef LBANN_HAS_PROTEUS
+__attribute__((annotate("jit", 1, 2, 4)))
+#endif
+__global__ void
+reduce_max_kernel(size_t height,
+                  size_t width,
+                  const TensorDataType* __restrict__ values,
+                  size_t values_ldim,
+                  TensorDataType* __restrict__ max_values)
 {
 
   // Indices
@@ -120,14 +124,18 @@ __global__ void reduce_max_kernel(size_t height,
  *  Grid dimension: (height / bsize) x width x 1
  */
 template <size_t bsize, typename TensorDataType>
-__global__ void fp_exp_kernel(size_t height,
-                              size_t width,
-                              const TensorDataType* __restrict__ input,
-                              size_t input_ldim,
-                              TensorDataType* __restrict__ output,
-                              size_t output_ldim,
-                              const TensorDataType* __restrict__ shifts,
-                              TensorDataType* __restrict__ sums)
+#ifdef LBANN_HAS_PROTEUS
+__attribute__((annotate("jit", 1, 2, 4, 6)))
+#endif
+__global__ void
+fp_exp_kernel(size_t height,
+              size_t width,
+              const TensorDataType* __restrict__ input,
+              size_t input_ldim,
+              TensorDataType* __restrict__ output,
+              size_t output_ldim,
+              const TensorDataType* __restrict__ shifts,
+              TensorDataType* __restrict__ sums)
 {
 
   // Indices
@@ -174,11 +182,15 @@ __global__ void fp_exp_kernel(size_t height,
  *  @param sums     sum(exp(x-shift)) for each column
  */
 template <typename TensorDataType>
-__global__ void fp_output_kernel(size_t height,
-                                 size_t width,
-                                 TensorDataType* __restrict__ output,
-                                 size_t output_ldim,
-                                 const TensorDataType* __restrict__ sums)
+#ifdef LBANN_HAS_PROTEUS
+__attribute__((annotate("jit", 1, 2, 4)))
+#endif
+__global__ void
+fp_output_kernel(size_t height,
+                 size_t width,
+                 TensorDataType* __restrict__ output,
+                 size_t output_ldim,
+                 const TensorDataType* __restrict__ sums)
 {
   const size_t gidx = threadIdx.x + blockIdx.x * blockDim.x;
   const size_t gidy = threadIdx.y + blockIdx.y * blockDim.y;
@@ -203,6 +215,9 @@ __global__ void fp_output_kernel(size_t height,
  *  Grid dimension: (height / bsize) x width x 1
  */
 template <size_t bsize, typename TensorDataType>
+#ifdef LBANN_HAS_PROTEUS
+__attribute__((annotate("jit", 1, 2, 4, 6)))
+#endif
 __global__ void
 bp_dot_product_kernel(size_t height,
                       size_t width,
@@ -251,6 +266,9 @@ bp_dot_product_kernel(size_t height,
  *  @param dot_products dot(y,dy) for each matrix column
  */
 template <size_t bsize, typename TensorDataType>
+#ifdef LBANN_HAS_PROTEUS
+__attribute__((annotate("jit", 1, 2, 4, 6, 9)))
+#endif
 __global__ void
 bp_kernel(size_t height,
           size_t width,

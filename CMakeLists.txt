@@ -194,6 +194,13 @@ option(LBANN_WARNINGS_AS_ERRORS
   "Build with warnings promoted to errors." OFF)
 mark_as_advanced(LBANN_WARNINGS_AS_ERRORS)
 
+option(LBANN_WITH_PROTEUS
+  "Use Proteus for JIT compilation" OFF)
+if (LBANN_WITH_PROTEUS)
+  find_package(proteus CONFIG REQUIRED)
+  set(LBANN_HAS_PROTEUS TRUE)
+endif (LBANN_WITH_PROTEUS)
+
 # The datatype option is not binary
 
 set(LBANN_DATATYPE "float"
@@ -759,6 +766,10 @@ if (LBANN_HAS_TBINF)
   target_link_libraries(lbann PUBLIC TBinf)
 endif ()
 
+if (LBANN_HAS_PROTEUS)
+  add_proteus(lbann)
+endif()
+
 target_link_libraries(lbann PUBLIC
   ${HWLOC_LIBRARIES}
   ${LBANN_H2_LIBS}
@@ -1148,6 +1159,7 @@ append_str_tf(_str
   LBANN_HAS_ONEDNN_GPU
   LBANN_HAS_OPENCV
   LBANN_HAS_PROTOBUF
+  LBANN_HAS_PROTEUS
   LBANN_HAS_PYTHON_FRONTEND
   LBANN_HAS_EMBEDDED_PYTHON
   LBANN_HAS_ROCM

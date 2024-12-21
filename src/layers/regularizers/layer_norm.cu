@@ -59,16 +59,23 @@ struct pair_sum
  *  Grid dimensions: (local_sample_size / bsize) x local_num_samples x 1
  */
 template <size_t bdimx, typename TensorDataType>
-__global__ void fp_sums_kernel(size_t local_num_samples,
-                               size_t normalization_size,
-                               size_t num_normalized,
-                               size_t normalization_stride,
-                               const TensorDataType* __restrict__ vals,
-                               size_t vals_ldim,
-                               TensorDataType* sums,
-                               size_t sums_stride,
-                               TensorDataType* sqsums,
-                               size_t sqsums_stride)
+#ifdef LBANN_HAS_PROTEUS
+__global__
+  __attribute__((annotate("jit", 1, 2, 3, 4, 6, 8, 10)))
+#else
+__global__
+#endif
+  void
+  fp_sums_kernel(size_t local_num_samples,
+                 size_t normalization_size,
+                 size_t num_normalized,
+                 size_t normalization_stride,
+                 const TensorDataType* __restrict__ vals,
+                 size_t vals_ldim,
+                 TensorDataType* sums,
+                 size_t sums_stride,
+                 TensorDataType* sqsums,
+                 size_t sqsums_stride)
 {
 
   // Indices and dimensions
@@ -121,13 +128,20 @@ __global__ void fp_sums_kernel(size_t local_num_samples,
  *  Grid dimensions: (local_num_samples / bsize) x 1 x 1
  */
 template <typename TensorDataType>
-__global__ void fp_statistics_kernel(size_t local_num_samples,
-                                     size_t global_normalization_size,
-                                     size_t num_normalized,
-                                     TensorDataType* means,
-                                     size_t means_stride,
-                                     TensorDataType* vars,
-                                     size_t vars_stride)
+#ifdef LBANN_HAS_PROTEUS
+__global__
+  __attribute__((annotate("jit", 1, 2, 3, 5, 7)))
+#else
+__global__
+#endif
+  void
+  fp_statistics_kernel(size_t local_num_samples,
+                       size_t global_normalization_size,
+                       size_t num_normalized,
+                       TensorDataType* means,
+                       size_t means_stride,
+                       TensorDataType* vars,
+                       size_t vars_stride)
 {
 
   const size_t gidx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -159,21 +173,25 @@ __global__ void fp_statistics_kernel(size_t local_num_samples,
  * 1
  */
 template <typename TensorDataType, bool HAS_SCALE, bool HAS_BIAS>
-__global__ void fp_output_kernel(size_t local_num_samples,
-                                 size_t normalization_size,
-                                 size_t num_normalized,
-                                 size_t normalization_stride,
-                                 TensorDataType epsilon,
-                                 const TensorDataType* __restrict__ input,
-                                 size_t input_ldim,
-                                 TensorDataType* __restrict__ output,
-                                 size_t output_ldim,
-                                 const TensorDataType* __restrict__ means,
-                                 size_t means_stride,
-                                 const TensorDataType* __restrict__ vars,
-                                 size_t vars_stride,
-                                 const TensorDataType* __restrict__ scale,
-                                 const TensorDataType* __restrict__ bias)
+#ifdef LBANN_HAS_PROTEUS
+__attribute__((annotate("jit", 1, 2, 3, 4, 7, 9, 11, 13)))
+#endif
+__global__ void
+fp_output_kernel(size_t local_num_samples,
+                 size_t normalization_size,
+                 size_t num_normalized,
+                 size_t normalization_stride,
+                 TensorDataType epsilon,
+                 const TensorDataType* __restrict__ input,
+                 size_t input_ldim,
+                 TensorDataType* __restrict__ output,
+                 size_t output_ldim,
+                 const TensorDataType* __restrict__ means,
+                 size_t means_stride,
+                 const TensorDataType* __restrict__ vars,
+                 size_t vars_stride,
+                 const TensorDataType* __restrict__ scale,
+                 const TensorDataType* __restrict__ bias)
 {
 
   const size_t gidx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -364,6 +382,9 @@ void fp_impl(lbann_comm& comm,
  * local_num_samples
  */
 template <size_t bdimx, typename TensorDataType, bool HAS_SCALE, bool HAS_BIAS>
+#ifdef LBANN_HAS_PROTEUS
+__attribute__((annotate("jit", 1, 2, 3, 4, 5, 7, 9, 11, 13, 15, 17)))
+#endif
 __global__ void
 bp_statistics_grad_kernel(size_t local_num_samples,
                           size_t normalization_size,
@@ -451,6 +472,9 @@ bp_statistics_grad_kernel(size_t local_num_samples,
  * 1
  */
 template <typename TensorDataType, bool HAS_SCALE>
+#ifdef LBANN_HAS_PROTEUS
+__attribute__((annotate("jit", 1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20)))
+#endif
 __global__ void
 bp_input_grad_kernel(size_t local_num_samples,
                      size_t global_normalization_size,
