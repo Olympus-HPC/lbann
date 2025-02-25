@@ -65,15 +65,14 @@ namespace {
  *  maxvals: vals_dims[0] x vals_dims[1] x (vals_dims[2] / bdimx)
  */
 template <typename TensorDataType, size_t bdimx>
-#ifdef LBANN_HAS_PROTEUS
+#if 0 // def LBANN_HAS_PROTEUS
 __attribute__((annotate("jit", 1, 3, 5)))
 #endif
-__global__ void
-fp_max_kernel(Size3 vals_dims,
-              const TensorDataType* __restrict__ vals_buffer,
-              Size3 vals_strides,
-              TensorDataType* __restrict__ maxvals_buffer,
-              Size3 maxvals_strides)
+__global__ void fp_max_kernel(Size3 vals_dims,
+                              const TensorDataType* __restrict__ vals_buffer,
+                              Size3 vals_strides,
+                              TensorDataType* __restrict__ maxvals_buffer,
+                              Size3 maxvals_strides)
 {
 
   // Indices and dimensions
@@ -127,15 +126,14 @@ fp_max_kernel(Size3 vals_dims,
  *  input_dims[0] x input_dims[1].
  */
 template <typename TensorDataType, size_t bdimx>
-#ifdef LBANN_HAS_PROTEUS
+#if 0 // def LBANN_HAS_PROTEUS
 __attribute__((annotate("jit", 1, 3)))
 #endif
-__global__ void
-fp_denom_kernel(Size3 input_dims,
-                const TensorDataType* __restrict__ input_buffer,
-                Size3 input_strides,
-                const TensorDataType* __restrict__ shifts,
-                TensorDataType* __restrict__ denoms)
+__global__ void fp_denom_kernel(Size3 input_dims,
+                                const TensorDataType* __restrict__ input_buffer,
+                                Size3 input_strides,
+                                const TensorDataType* __restrict__ shifts,
+                                TensorDataType* __restrict__ denoms)
 {
 
   // Indices and dimensions
@@ -187,7 +185,7 @@ fp_denom_kernel(Size3 input_dims,
  *  input_dims[0] x input_dims[1].
  */
 template <typename TensorDataType>
-#ifdef LBANN_HAS_PROTEUS
+#if 0 // def LBANN_HAS_PROTEUS
 __attribute__((annotate("jit", 1, 3, 5)))
 #endif
 __global__ void
@@ -373,7 +371,7 @@ namespace {
  *  output_dims[0] x output_dims[1].
  */
 template <typename TensorDataType, size_t bdimx>
-#ifdef LBANN_HAS_PROTEUS
+#if 0 // def LBANN_HAS_PROTEUS
 __attribute__((annotate("jit", 1, 3, 5)))
 #endif
 __global__ void
@@ -433,7 +431,7 @@ bp_y_dot_dy_kernel(Size3 output_dims,
  *  output_dims[0] x output_dims[1].
  */
 template <typename TensorDataType>
-#ifdef LBANN_HAS_PROTEUS
+#if 0 // def LBANN_HAS_PROTEUS
 __attribute__((annotate("jit", 1, 3, 5, 7)))
 #endif
 __global__ void
