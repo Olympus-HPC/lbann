@@ -30,6 +30,7 @@
 #ifdef HYDROGEN_HAVE_CUB
 #include "hipcub/block/block_reduce.hpp"
 #endif // HYDROGEN_HAVE_CUB
+#include <hip/hip_bf16.h>
 #include <hip/hip_fp16.h>
 #include <limits>
 #endif // __HIPCC__
@@ -51,8 +52,8 @@ __device__ __forceinline__ __half gpu_lib::atomic_add(__half* address,
     unsigned int* prv_address_as_uint = (unsigned int*)(address - 1);
     unsigned int old = *prv_address_as_uint;
     unsigned int assumed, updated;
-    __half* old_as_half = ((__half*)&old)+1;
-    __half* updated_as_half = ((__half*)&updated)+1;
+    __half* old_as_half = ((__half*)&old) + 1;
+    __half* updated_as_half = ((__half*)&updated) + 1;
     do {
       assumed = old;
       updated = old;
@@ -61,8 +62,7 @@ __device__ __forceinline__ __half gpu_lib::atomic_add(__half* address,
     } while (assumed != old);
     return *old_as_half;
   }
-  else
-  {
+  else {
     unsigned int* address_as_uint = (unsigned int*)address;
     unsigned int old = *address_as_uint;
     __half* old_as_half = (__half*)&old;
@@ -165,7 +165,7 @@ __device__ __forceinline__ T gpu_lib::block_reduce(T val)
 #define WRAP_UNARY_ROCM_HALF_MATH_FUNCTION(func)                               \
   __device__ __forceinline__ __half gpu_lib::func(__half const& x)             \
   {                                                                            \
-    return ::h##func(x);                                                       \
+    return h##func(x);                                                         \
   }
 
 // FIXME (trb): This is maybe not the best long-term solution, but it
@@ -190,7 +190,7 @@ WRAP_UNARY_ROCM_HALF_MATH_FUNCTION(exp)
 //  implementation could be:
 __device__ __forceinline__ __half gpu_lib::expm1(__half const& x)
 {
-  return ::__hsub(::hexp(x), ::__float2half(1.f));
+  return __hsub(hexp(x), __float2half(1.f));
 }
 
 WRAP_UNARY_ROCM_HALF_MATH_FUNCTION(log)
@@ -204,7 +204,7 @@ WRAP_UNARY_ROCM_HALF_MATH_FUNCTION(sin)
 //  accurate than a native implementation.
 __device__ __forceinline__ __half gpu_lib::tan(__half const& x)
 {
-  return ::__hdiv(::hsin(x), ::hcos(x));
+  return __hdiv(hsin(x), hcos(x));
 }
 
 WRAP_UNARY_ROCM_HALF_CAST_TO_FLOAT_MATH_FUNCTION(acos)
@@ -242,12 +242,12 @@ __device__ __forceinline__ bool gpu_lib::isfinite(__half const& x)
 // Binary math functions
 __device__ __forceinline__ __half gpu_lib::min(const __half& x, const __half& y)
 {
-  return ::__hle(x, y) ? x : y;
+  return __hle(x, y) ? x : y;
 }
 
 __device__ __forceinline__ __half gpu_lib::max(const __half& x, const __half& y)
 {
-  return ::__hle(x, y) ? y : x;
+  return __hle(x, y) ? y : x;
 }
 
 // Numeric limits
